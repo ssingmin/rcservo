@@ -30,16 +30,9 @@
 /* Includes ------------------------------------------------------------------*/
 #include "stm8s_it.h"
 
-   extern int testtick;
-   extern int rxflag;
-   extern char RxBuffer1;
    extern char RWCnt;
    extern char RWBuf[];
    
-   int i = 0;
-
-
-
 /** @addtogroup Template_Project
   * @{
   */
@@ -239,9 +232,6 @@ INTERRUPT_HANDLER(TIM1_UPD_OVF_TRG_BRK_IRQHandler, 11)
   /* In order to detect unexpected events during development,
      it is recommended to set a breakpoint on the following instruction.
   */
-  
-     testtick++;
-     TIM1_ClearITPendingBit(TIM1_IT_UPDATE);
 }
 
 /**

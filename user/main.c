@@ -56,7 +56,6 @@ __IO TestStatus OperationStatus;
 
 int testtick=0;
 int rxflag;
-uint8_t temp = 0;
 
 //uint8_t GBuffer[FLASH_BLOCK_SIZE];
 uint8_t GBuffer[128];//128=eeprom size
@@ -72,14 +71,11 @@ void debugchar(uint8_t debugchar);
 #endif  
 
 
-
 void Delay(uint32_t nCount);
 static void CLK_Config(void);
 void BufInit(uint8_t * buf);
 void Write_data(uint8_t * buf);
 uint8_t parser_data(void);
-
-
 
 void main(void)
 {
@@ -90,48 +86,6 @@ void main(void)
   //GPIO_Init(GPIOA, GPIO_PIN_3, GPIO_MODE_OUT_PP_HIGH_FAST);
   GPIO_Init(GPIOA, GPIO_PIN_3, GPIO_MODE_OUT_PP_LOW_FAST);//test gpio
   GPIO_Init(GPIOD, GPIO_PIN_4, GPIO_MODE_OUT_PP_LOW_FAST);//485 CONTROL
-  
-  
-#if 0
-    TIM1_DeInit();
-
-  /* Time Base configuration */
-  TIM1_TimeBaseInit(0, TIM1_COUNTERMODE_UP, 4095, 0);
-
-  /* Channel 1, 2 and 3 Configuration in TIMING mode */  
-  
-  
-   // TIM1_OC1Init(TIM1_OCMODE_PWM2, TIM1_OUTPUTSTATE_ENABLE, TIM1_OUTPUTNSTATE_ENABLE,
-      //         2047, TIM1_OCPOLARITY_HIGH, TIM1_OCNPOLARITY_HIGH, TIM1_OCIDLESTATE_SET,
-      //         TIM1_OCNIDLESTATE_SET);  
-  /* TIM1_Pulse = 2047 */
-  TIM1_OC1Init(TIM1_OCMODE_PWM2, TIM1_OUTPUTSTATE_ENABLE, TIM1_OUTPUTNSTATE_ENABLE,
-  //TIM1_OC1Init(TIM1_OCMODE_TIMING, TIM1_OUTPUTSTATE_ENABLE, TIM1_OUTPUTNSTATE_ENABLE,
-               2047, TIM1_OCPOLARITY_HIGH, TIM1_OCNPOLARITY_HIGH, TIM1_OCIDLESTATE_SET,
-               TIM1_OCNIDLESTATE_SET);  
-
-  /* TIM1_Pulse = 1023 */
-  TIM1_OC2Init(TIM1_OCMODE_TIMING, TIM1_OUTPUTSTATE_ENABLE, TIM1_OUTPUTNSTATE_ENABLE, 1023,
-               TIM1_OCPOLARITY_HIGH, TIM1_OCNPOLARITY_HIGH, TIM1_OCIDLESTATE_SET, 
-               TIM1_OCNIDLESTATE_SET); 
-
-  /* TIM1_Pulse = 511 */
-  TIM1_OC3Init(TIM1_OCMODE_TIMING, TIM1_OUTPUTSTATE_ENABLE, TIM1_OUTPUTNSTATE_ENABLE,
-               511, TIM1_OCPOLARITY_HIGH, TIM1_OCNPOLARITY_HIGH, TIM1_OCIDLESTATE_SET,
-               TIM1_OCNIDLESTATE_SET); 
-
-  /* Automatic Output enable, Break, dead time and lock configuration*/
-  TIM1_BDTRConfig( TIM1_OSSISTATE_ENABLE,  TIM1_LOCKLEVEL_OFF, 1,  TIM1_BREAK_DISABLE,
-                   TIM1_BREAKPOLARITY_LOW,  TIM1_AUTOMATICOUTPUT_ENABLE);
-  
-  TIM1_CCPreloadControl(ENABLE);
-  TIM1_ITConfig(TIM1_IT_COM, ENABLE);
-
-  /* TIM1 counter enable */
-  TIM1_Cmd(ENABLE);
-  
-#endif 
-  
   
     //UART1_DeInit();
   /* UART1 configuration ------------------------------------------------------*/
@@ -154,8 +108,6 @@ void main(void)
   
   ////////////////eeprom write test smlee///////////////
 
-
-    
       /* Define FLASH programming time */
     FLASH_SetProgrammingTime(FLASH_PROGRAMTIME_STANDARD);
 
@@ -172,72 +124,11 @@ void main(void)
   while (1)
   {
     
- 
- //   TIM2->CCR1H=0x02;
-//    TIM2->CCR1L=0x0;
- //   pwmval++;
-   // if(pwmval > 4096){pwmval = 0;}//init pwmval
-   // TIM1->CCR1H = (uint8_t)(pwmval >> 8);
-  //  TIM1->CCR1L = (uint8_t)(pwmval);
-    //debugmsg("hi");
-
-    Delay(500000);
-      GPIOA->ODR ^= (uint8_t)GPIO_PIN_3;
-      // Tx_485;
-       //temp= FLASH_ReadByte(0);
-     //  UART1_SendData8(temp);
-     //  while ((UART1->SR & UART1_FLAG_TC) == RESET);
-     //  Rx_485;
-       
-       
-     //GPIOD->ODR |= (uint8_t)GPIO_PIN_4;
-
-   //  UART1_SendData8(RxBuffer1);
-
-    // UART1_ITConfig(UART1_IT_RXNE_OR, ENABLE);
-    // while ((UART1->SR & UART1_FLAG_TC) == RESET);    
-    // GPIOD->ODR &= !((uint8_t)GPIO_PIN_4);
-    
-      parser_data();    //!!!!parsing!!!!
-      //rx_flag = parser_data();    //!!!!parsing!!!!
-
-        *testarr= rx_flag;
-
- 
-    //debugmsg(testarr);
-    //for(int i=0;i<5;i++){testarr[i]=0;}//init
-    
-#if 0
-    if(rx_flag>0)
-    {
-      Delay(400000);
-    Tx_485;
-      UART1_SendData8(rx_flag);
-      while (UART1_GetFlagStatus(UART1_FLAG_TXE) == RESET);
-    UART1_ITConfig(UART1_IT_RXNE_OR, ENABLE);
-    
-    //for(int j = 0;j<RW_len;j++){buf[j]=0;}
-    while ((UART1->SR & UART1_FLAG_TC) == RESET);
-    Rx_485;
-    rx_flag = 0;
-
+      Delay(500000);
       
-      //motor_control(feat.choi)
-    }
-#endif
-    
-    if(testtick>1000)
-    {
-  
-    
-    if(rxflag)
-    {
       GPIOA->ODR ^= (uint8_t)GPIO_PIN_3;
-      rxflag = 0;
-    }
-    testtick = 0;
-    
-    }
+
+      parser_data();    //!!!!parsing!!!!
 
   }//end while
   
@@ -276,7 +167,6 @@ void debugmsg(volatile uint8_t * debugbuf)
     }
     
   UART1_ITConfig(UART1_IT_RXNE_OR, ENABLE);
-  
   while ((UART1->SR & UART1_FLAG_TC) == RESET);
   Rx_485;
 }
@@ -287,9 +177,6 @@ void debugchar(uint8_t debugchar)
 
   UART1_SendData8(debugchar);
   while (UART1_GetFlagStatus(UART1_FLAG_TXE) == RESET);
-  
- // UART1_ITConfig(UART1_IT_RXNE_OR, ENABLE);
-  
   while ((UART1->SR & UART1_FLAG_TC) == RESET);
   Rx_485;
 }
@@ -318,22 +205,14 @@ static void CLK_Config(void)
     /* Configure the HSI prescaler to the optimal value */
     CLK_SYSCLKConfig(CLK_PRESCALER_HSIDIV1);
 
-    /* Output Fcpu on CLK_CCO pin */
-    //CLK_CCOConfig(CLK_OUTPUT_CPU);
-        
-    /* Configure the system clock to use HSE clock source and to run at 24Mhz */
-    //status = CLK_ClockSwitchConfig(CLK_SWITCHMODE_AUTO, CLK_SOURCE_HSE, DISABLE, CLK_CURRENTCLOCKSTATE_DISABLE);
-    
-   /* while (ButtonPressed == FALSE)
-    {
-    }*/
-    /* Configure the system clock to use HSI clock source and to run at 16Mhz */
     status = CLK_ClockSwitchConfig(CLK_SWITCHMODE_AUTO, CLK_SOURCE_HSI, DISABLE, CLK_CURRENTCLOCKSTATE_DISABLE);
 
 }
 void BufInit(uint8_t * buf)
 {
-  for(int j = 0;j<RW_len;j++){buf[j]=0;} 
+  int j = 0;
+
+  for(j = 0;j<RW_len;j++){buf[j]=0;} 
     RWCnt = 0;
     while ((UART1->SR & UART1_FLAG_TC) == RESET);
   
@@ -342,8 +221,9 @@ void BufInit(uint8_t * buf)
 
 void Write_data(uint8_t * buf)
 {
+    int i=0;
     Tx_485;
-    for(int i=0;i<RWCnt;i++){
+    for(i=0;i<RWCnt;i++){
       UART1_SendData8(buf[i]);
       while (UART1_GetFlagStatus(UART1_FLAG_TXE) == RESET);
     }
@@ -356,33 +236,31 @@ void Write_data(uint8_t * buf)
 }
 
 
-uint8_t parser_data()
+uint8_t parser_data(void)
 {
     uint8_t buf[RW_len]={0x00,};
     unsigned int length = 0;
     uint8_t checksum = 0;
     uint8_t temp = 0;
     uint8_t tmp = 0;
-
+    int i =0;
     if(RWBuf[0] == 0x02)
     {
       memcpy(buf, RWBuf, RW_len);
       
       length = buf[1];
       
-      for(int i=1;i<=length-2;i++)//xor 
+      for(i=1;i<=length-2;i++)//xor 
       {
         checksum ^= buf[i];
       }
       
       if(buf[length] != checksum)//checksum error and init
       {
-
         UART1_ITConfig(UART1_IT_RXNE_OR, ENABLE);
         BufInit(buf);
         BufInit(RWBuf);
         return 0;
-        
       }
       
 
@@ -417,10 +295,6 @@ uint8_t parser_data()
                 Write_data(RWBuf); 
                 return 3;
                   
-            // case 0x : //ID setting
-            //     Write_data(RWBuf); 
-            //     return 4;
-          
             case 0xA1 : //motor control
                 //ID=buf[4];
                 //Position_H=buf[5];
@@ -429,27 +303,12 @@ uint8_t parser_data()
                 //Velocity_L=buf[8];
                 Write_data(RWBuf); 
                 return 5;
-              /*  
-            case 0x : //motor status
-                Write_data(RWBuf); 
-                return 2;                
-                
-            case 0x : //motor status
-                Write_data(RWBuf); 
-                return 2;
-            
-            case 0x : //motor status
-                Write_data(RWBuf); 
-                return 2;
-                */
-                
-            // default :    //error
-            //     return 0;
+ 
         }
-        
-     //   
+
     }
     BufInit(RWBuf);
+
     return 0;    // other error
 }
 
